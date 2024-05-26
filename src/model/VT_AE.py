@@ -15,10 +15,11 @@ import model.spatial as S
 # torch.autograd.set_detect_anomaly(True) # this is to check any problem in the network by backtracking
 
 class VT_AE(nn.Module):
-    def __init__(self, image_size = 512,
+    def __init__(self, image_size = 256,
                     patch_size = 64,
+                    channels=3,
                     num_classes = 1,
-                    dim = 512,
+                    dim = 256,
                     depth = 6,
                     heads = 8,
                     mlp_dim = 1024,
@@ -28,16 +29,20 @@ class VT_AE(nn.Module):
         self.vt = ViT(
             image_size = image_size,
             patch_size = patch_size,
+            channels=channels,
             num_classes = num_classes,
             dim = dim,
             depth = depth,
             heads = heads,
             mlp_dim = mlp_dim )
         
+        in_dim_caps = 8
+        if image_size == 256:
+            in_dim_caps = 4
      
-        self.decoder = M.decoder2(8)
+        self.decoder = M.decoder2(8, out_channels=channels)
         # self.G_estimate= mdn1.MDN() # Trained in modular fashion
-        self.Digcap = S.DigitCaps(in_num_caps=((image_size//patch_size)**2)*8*8, in_dim_caps=8)
+        self.Digcap = S.DigitCaps(in_num_caps=((image_size//patch_size)**2)*8*8, in_dim_caps=in_dim_caps)
         self.mask = torch.ones(1, image_size//patch_size, image_size//patch_size).bool().cuda()
         self.Train = train
         

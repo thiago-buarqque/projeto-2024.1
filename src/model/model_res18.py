@@ -15,26 +15,53 @@ from model.config import Config
     
 ## Decoder ##
    
+# class decoder2(nn.Module):
+#     def __init__(self, in_channels, out_channels=3):
+#         super(decoder2, self).__init__()
+#         self.decoder2 = nn.Sequential(
+#              nn.ConvTranspose2d(in_channels= in_channels, out_channels=16,kernel_size= 3, stride=2,padding=1),  # In b, 8, 8, 8 >> out b, 16, 15, 15
+#              nn.BatchNorm2d(16, affine = True),
+#              nn.ReLU(True),            
+#              nn.ConvTranspose2d(16, 32, 9, stride=3, padding = 1),  #out> b,32, 49, 49
+#              nn.BatchNorm2d(32, affine = True),
+#              nn.ReLU(True),             
+#              nn.ConvTranspose2d(32, 32, 7, stride=5, padding=1),  #out> b, 32, 245, 245
+#              nn.BatchNorm2d(32, affine = True),
+#              nn.ReLU(True), 
+#              nn.ConvTranspose2d(32, 16, 9, stride=2),  #out> b, 16, 497, 497
+#              nn.BatchNorm2d(16, affine = True),
+#              nn.ReLU(True), 
+#              nn.ConvTranspose2d(16, 8, 6, stride=1),  #out> b, 8, 502, 502
+#              nn.BatchNorm2d(8, affine = True),
+#              nn.ReLU(True),
+#              nn.ConvTranspose2d(8, out_channels, 11, stride=1),  #out> b, 3, 512, 512
+#              nn.Tanh()
+#              )
+        
+#     def forward(self, x):
+#          recon = self.decoder2(x)
+#          return recon
+                  
 class decoder2(nn.Module):
-    def __init__(self, in_channels):
+    def __init__(self, in_channels, out_channels=3):
         super(decoder2, self).__init__()
         self.decoder2 = nn.Sequential(
-             nn.ConvTranspose2d(in_channels= in_channels, out_channels=16,kernel_size= 3, stride=2,padding=1),  # In b, 8, 8, 8 >> out b, 16, 15, 15
-             nn.BatchNorm2d(16, affine = True),
+             nn.ConvTranspose2d(in_channels= in_channels, out_channels=16, kernel_size=3, stride=2, padding=1, output_padding=1),  # Output: b, 16, 2 * 8 - 2 + 3 - 2*1 + 1 = 16
+             nn.BatchNorm2d(16, affine=True),
              nn.ReLU(True),            
-             nn.ConvTranspose2d(16, 32, 9, stride=3, padding = 1),  #out> b,32, 49, 49
-             nn.BatchNorm2d(32, affine = True),
+             nn.ConvTranspose2d(16, 32, 3, stride=2, padding=1, output_padding=1),  # Output: b, 32, 32
+             nn.BatchNorm2d(32, affine=True),
              nn.ReLU(True),             
-             nn.ConvTranspose2d(32, 32, 7, stride=5, padding=1),  #out> b, 32, 245, 245
-             nn.BatchNorm2d(32, affine = True),
+             nn.ConvTranspose2d(32, 32, 3, stride=2, padding=1, output_padding=1),  # Output: b, 32, 64
+             nn.BatchNorm2d(32, affine=True),
              nn.ReLU(True), 
-             nn.ConvTranspose2d(32, 16, 9, stride=2),  #out> b, 16, 497, 497
-             nn.BatchNorm2d(16, affine = True),
+             nn.ConvTranspose2d(32, 16, 3, stride=2, padding=1, output_padding=1),  # Output: b, 16, 128
+             nn.BatchNorm2d(16, affine=True),
              nn.ReLU(True), 
-             nn.ConvTranspose2d(16, 8, 6, stride=1),  #out> b, 8, 502, 502
-             nn.BatchNorm2d(8, affine = True),
+             nn.ConvTranspose2d(16, 8, 3, stride=2, padding=1, output_padding=1),  # Output: b, 8, 256
+             nn.BatchNorm2d(8, affine=True),
              nn.ReLU(True),
-             nn.ConvTranspose2d(8, 3, 11, stride=1),  #out> b, 3, 512, 512
+             nn.ConvTranspose2d(8, out_channels, 3, stride=1, padding=1),  # Output: b, 3, 256
              nn.Tanh()
              )
         
