@@ -26,15 +26,23 @@ class PreNorm(nn.Module):
         return self.fn(self.norm(x), **kwargs)
 
 class FeedForward(nn.Module):
-    def __init__(self, dim, hidden_dim):
+    def __init__(self, dim, hidden_dim, dropout = 0.1):
         super().__init__()
+
         self.net = nn.Sequential(
+            nn.LayerNorm(dim),
             nn.Linear(dim, hidden_dim),
             nn.GELU(),
+            nn.Dropout(dropout),
             nn.Linear(hidden_dim, dim),
-            # nn.ReLU(inplace=True)
-           
+            nn.Dropout(dropout)
         )
+        # self.net = nn.Sequential(
+        #     nn.Linear(dim, hidden_dim),
+        #     nn.GELU(),
+        #     nn.Linear(hidden_dim, dim),
+        #     # nn.ReLU(inplace=True)
+        # )
     def forward(self, x):
         return self.net(x)
 

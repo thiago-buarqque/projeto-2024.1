@@ -163,3 +163,5 @@ cython_debug/
 
 vit_models
 cnn_models
+runs
+**/*.zip

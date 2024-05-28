@@ -26,6 +26,12 @@ class VT_AE(nn.Module):
                     train= True):
 
         super(VT_AE, self).__init__()
+        
+        in_dim_caps = 4
+        if image_size == 512:
+            in_dim_caps = 8
+            dim = 512
+        
         self.vt = ViT(
             image_size = image_size,
             patch_size = patch_size,
@@ -35,10 +41,6 @@ class VT_AE(nn.Module):
             depth = depth,
             heads = heads,
             mlp_dim = mlp_dim )
-        
-        in_dim_caps = 8
-        if image_size == 256:
-            in_dim_caps = 4
      
         self.decoder = M.decoder2(8, out_channels=channels)
         # self.G_estimate= mdn1.MDN() # Trained in modular fashion
