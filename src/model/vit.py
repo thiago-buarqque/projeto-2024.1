@@ -1,3 +1,7 @@
+# Vision Transformer is from Vit Pytorch
+# https://github.com/lucidrains/vit-pytorch/blob/main/vit_pytorch/vit.py
+# Modified for the current task
+
 import torch
 from torch import nn
 
@@ -107,8 +111,9 @@ class ViT(nn.Module):
 
         self.pool = pool
         self.to_latent = nn.Identity()
-
-        self.mlp_head = nn.Linear(dim, num_classes)
+        
+        # Since it's not classification, we can ignore the MLP head
+        # self.mlp_head = nn.Linear(dim, num_classes)
 
     def forward(self, img):
         x = self.to_patch_embedding(img)
@@ -123,5 +128,7 @@ class ViT(nn.Module):
 
         x = x.mean(dim = 1) if self.pool == 'mean' else x[:, 0]
 
-        x = self.to_latent(x)
-        return self.mlp_head(x)
+        return self.to_latent(x)
+    
+        # Since it's not classification, we can ignore the MLP head
+        # return self.mlp_head(x)
