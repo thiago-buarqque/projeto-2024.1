@@ -67,6 +67,7 @@ class MVTec:
         mask = torch.zeros(3, image.size(1), image.size(2))
         
         has_anomaly = False
+        y_one_hot = [1.0, 0.0]
         if self.test and path.find("/good") == -1:
             mask_path = path.replace("/test/", "/ground_truth/")
             mask_path = mask_path.split(".")[0]+"_mask." + self.file_extension
@@ -76,5 +77,6 @@ class MVTec:
             mask = self.__transform_image(mask)
             
             has_anomaly = True
+            y_one_hot = [0.0, 1.0]
 
-        return image, mask, has_anomaly
+        return image, mask, has_anomaly, torch.tensor(y_one_hot)

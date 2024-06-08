@@ -11,9 +11,12 @@ class Model(nn.Module):
                     depth = 6,
                     heads = 8,
                     mlp_dim = 1024,
-                    decoder_input_channels = 16):
+                    decoder_input_channels = 16,
+                    reconstruction=True):
 
         super(Model, self).__init__()
+        
+        self.reconstruction = reconstruction
         
         if image_size == 512:
             dim = 512
@@ -26,13 +29,18 @@ class Model(nn.Module):
             dim = dim,
             depth = depth,
             heads = heads,
-            mlp_dim = mlp_dim )
+            mlp_dim = mlp_dim,
+            reconstruction = reconstruction)
      
-        self.decoder = Decoder(in_channels=decoder_input_channels, out_channels=channels)
+        if self.reconstruction:
+            self.decoder = Decoder(in_channels=decoder_input_channels, out_channels=channels)
 
     def forward(self,x):       
         encoded = self.vit(x)
-
+        
+        if not self.reconstruction:
+            return encoded
+        
         recons = self.decoder(encoded)
             
         return encoded, recons

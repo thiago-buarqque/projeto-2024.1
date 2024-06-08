@@ -85,7 +85,7 @@ class Transformer(nn.Module):
         return self.norm(x)
 
 class ViT(nn.Module):
-    def __init__(self, *, image_size, patch_size, num_classes, dim, depth, heads, mlp_dim, pool = 'cls', channels = 3, dim_head = 64, dropout = 0., emb_dropout = 0.):
+    def __init__(self, *, image_size, patch_size, num_classes, dim, depth, heads, mlp_dim, pool = 'cls', channels = 3, dim_head = 64, dropout = 0., emb_dropout = 0., reconstruction = True):
         super().__init__()
         image_height, image_width = pair(image_size)
         patch_height, patch_width = pair(patch_size)
@@ -111,9 +111,15 @@ class ViT(nn.Module):
 
         self.pool = pool
         self.to_latent = nn.Identity()
+        self.reconstruction = reconstruction
         
-        # Since it's not classification, we can ignore the MLP head
-        # self.mlp_head = nn.Linear(dim, num_classes)
+        if not self.reconstruction:
+            self.mlp_head = nn.Linear(dim, num_classes)
+            
+        self.gradients = None
+
+    def save_gradient(self, grad):
+        self.gradients = grad
 
     def forward(self, img):
         x = self.to_patch_embedding(img)
@@ -125,10 +131,29 @@ class ViT(nn.Module):
         x = self.dropout(x)
 
         x = self.transformer(x)
+        
+        # Register hook for gradients
+        if x.requires_grad:
+            x.register_hook(self.save_gradient)
 
         x = x.mean(dim = 1) if self.pool == 'mean' else x[:, 0]
 
-        return self.to_latent(x)
+        if self.reconstruction:
+            return self.to_latent(x)
     
-        # Since it's not classification, we can ignore the MLP head
-        # return self.mlp_head(x)
+        return self.mlp_head(x)
+    
+    def get_activations_gradient(self):
+        return self.gradients
+
+    def get_activations(self, img):
+        x = self.to_patch_embedding(img)
+        b, n, _ = x.shape
+
+        cls_tokens = repeat(self.cls_token, '1 1 d -> b 1 d', b=b)
+        x = torch.cat((cls_tokens, x), dim=1)
+        x += self.pos_embedding[:, :(n + 1)]
+        x = self.dropout(x)
+
+        x = self.transformer(x)
+        return x
