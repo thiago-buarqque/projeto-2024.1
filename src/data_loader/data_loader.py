@@ -78,5 +78,7 @@ class MVTec:
             
             has_anomaly = True
             y_one_hot = [0.0, 1.0]
+            
+            del mask_path
 
         return image, mask, has_anomaly, torch.tensor(y_one_hot)

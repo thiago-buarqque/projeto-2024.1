@@ -115,11 +115,6 @@ class ViT(nn.Module):
         
         if not self.reconstruction:
             self.mlp_head = nn.Linear(dim, num_classes)
-            
-        self.gradients = None
-
-    def save_gradient(self, grad):
-        self.gradients = grad
 
     def forward(self, img):
         x = self.to_patch_embedding(img)
@@ -133,8 +128,8 @@ class ViT(nn.Module):
         x = self.transformer(x)
         
         # Register hook for gradients
-        if x.requires_grad:
-            x.register_hook(self.save_gradient)
+        # if x.requires_grad:
+        #     x.register_hook(self.save_gradient)
 
         x = x.mean(dim = 1) if self.pool == 'mean' else x[:, 0]
 
@@ -142,18 +137,3 @@ class ViT(nn.Module):
             return self.to_latent(x)
     
         return self.mlp_head(x)
-    
-    def get_activations_gradient(self):
-        return self.gradients
-
-    def get_activations(self, img):
-        x = self.to_patch_embedding(img)
-        b, n, _ = x.shape
-
-        cls_tokens = repeat(self.cls_token, '1 1 d -> b 1 d', b=b)
-        x = torch.cat((cls_tokens, x), dim=1)
-        x += self.pos_embedding[:, :(n + 1)]
-        x = self.dropout(x)
-
-        x = self.transformer(x)
-        return x

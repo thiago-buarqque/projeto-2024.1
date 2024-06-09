@@ -40,7 +40,7 @@ class Model(nn.Module):
         
         if not self.reconstruction:
             return encoded
-        
+        # print(f"ViT output: {encoded.shape}")
         recons = self.decoder(encoded)
             
         return encoded, recons
