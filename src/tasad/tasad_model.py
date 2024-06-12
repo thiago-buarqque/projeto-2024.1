@@ -157,6 +157,7 @@ class Decoder(nn.Module):
         self.up2 = self._make_upsample_block(base_width * 2, base_width * 2)
         self.db2 = self._make_double_block(base_width * 2, base_width)
         self.final_out = nn.Conv2d(base_width, out_channels, kernel_size=3, padding=1)
+        self.sigmoid = nn.Sigmoid()  # Added sigmoid activation
 
     def _make_upsample_block(self, in_channels, out_channels):
         """
@@ -227,4 +228,5 @@ class Decoder(nn.Module):
         up2 = self.up2(db1)
         db2 = self.db2(up2)
         out = self.final_out(db2)
+        out = self.sigmoid(out)
         return out

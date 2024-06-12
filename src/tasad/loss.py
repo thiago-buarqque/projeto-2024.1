@@ -142,9 +142,9 @@ def ssim(img1, img2, window_size=11, window=None, size_average=True, full=False,
 
 
     ##
-    window              = window.cuda(img1.device)
+    window              = window.to(img1.device)
     mu1 = F.conv2d(img1, window, padding=padd, groups=channel)
-    window              = window.cuda(img2.device)
+    window              = window.to(img2.device)
     mu2 = F.conv2d(img2, window, padding=padd, groups=channel)
 
     mu1_sq = mu1.pow(2)
@@ -184,7 +184,7 @@ class SSIM(torch.nn.Module):
         # Assume 1 channel for SSIM
         cuda2 = torch.device(f'cuda:{gpu_id}')
         self.channel = 1
-        self.window = create_window(window_size).cuda(cuda2)
+        self.window = create_window(window_size)
 
     def forward(self, img1, img2):
         (_, channel, _, _) = img1.size()

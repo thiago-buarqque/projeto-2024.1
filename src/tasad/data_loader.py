@@ -70,7 +70,7 @@ class MVTecTrainDataset(Dataset):
         perlin_scaley = 2 ** (torch.randint(min_perlin_scale, perlin_scale, (1,)).numpy()[0])
 
         anomaly_choice = np.random.choice(self.anomaly_type, 1)[0]
-        seg_choices = [30, 150, 250]
+        seg_choices = [30, 50, 80]
         seg_choice = np.random.choice(seg_choices, len(seg_choices))[0]
         
         if anomaly_choice == 0:
