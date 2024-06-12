@@ -165,3 +165,4 @@ vit_models
 cnn_models
 runs
 **/*.zip
+tasad_models
